@@ -19,6 +19,9 @@ export const CROPS: CropInfo[] = [
   { id: "sugarcane", nameKey: "crop.sugarcane", image: sugarcaneImg, threshold: 60 },
   { id: "cotton", nameKey: "crop.cotton", image: cottonImg, threshold: 45 },
   { id: "maize", nameKey: "crop.maize", image: maizeImg, threshold: 50 },
+  { id: "tomato", nameKey: "crop.tomato", image: wheatImg, threshold: 55 },
+  { id: "onion", nameKey: "crop.onion", image: barleyImg, threshold: 45 },
+  { id: "soybean", nameKey: "crop.soybean", image: maizeImg, threshold: 50 },
 ];
 
 export function getCropById(id: string): CropInfo | undefined {

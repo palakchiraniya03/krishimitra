@@ -87,6 +87,9 @@ const translations: Record<string, Record<Language, string>> = {
   "crop.sugarcane": { en: "Sugarcane", hi: "गन्ना", mr: "ऊस" },
   "crop.cotton": { en: "Cotton", hi: "कपास", mr: "कापूस" },
   "crop.maize": { en: "Maize", hi: "मक्का", mr: "मका" },
+  "crop.tomato": { en: "Tomato", hi: "टमाटर", mr: "टोमॅटो" },
+  "crop.onion": { en: "Onion", hi: "प्याज", mr: "कांदा" },
+  "crop.soybean": { en: "Soybean", hi: "सोयाबीन", mr: "सोयाबीन" },
 };
 
 export function t(key: string, lang: Language): string {
