@@ -2,7 +2,7 @@ export type Language = "en" | "hi" | "mr";
 
 const translations: Record<string, Record<Language, string>> = {
   // General
-  "app.name": { en: "SmartGrow", hi: "SmartGrow", mr: "SmartGrow" },
+  "app.name": {en: "KrishiMitra", hi: "KrishiMitra", mr: "KrishiMitra" },
   "hello": { en: "Hello,", hi: "नमस्ते,", mr: "नमस्कार," },
   "settings": { en: "Settings", hi: "सेटिंग्स", mr: "सेटिंग्ज" },
   "notifications": { en: "Notifications", hi: "सूचनाएं", mr: "सूचना" },

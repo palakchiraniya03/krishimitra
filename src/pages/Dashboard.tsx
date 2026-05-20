@@ -273,7 +273,6 @@ useEffect(() => {
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">
   {item.moisture && `Moisture: ${item.moisture}%`}
-  {item.moisture && item.temperature && " | "}
   {item.temperature && `Temp: ${item.temperature}°C`}
 </p>
                 </div>
