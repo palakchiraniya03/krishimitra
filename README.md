@@ -20,7 +20,7 @@
 
 ## Overview
 
-KrishiMitra is a full-stack IoT irrigation solution built for small and mid-scale farmers. he ESP32 microcontroller continuously reads soil moisture from sensors and syncs data to Firebase Realtime Database. A React-based Progressive Web App (PWA) with an Android wrapper reads this data live and automatically controls a water pump — while also checking real-time rain forecasts via the OpenWeatherMap API to avoid unnecessary watering.
+KrishiMitra is a full-stack IoT irrigation solution built for small and mid-scale farmers.The ESP32 microcontroller continuously reads soil moisture from a capacitive sensor and syncs data to Firebase Realtime Database. A React-based Progressive Web App (PWA) with an Android wrapper reads this data live and automatically controls a water pump — while also checking real-time rain forecasts via the OpenWeatherMap API to avoid unnecessary watering.
 
 ---
 
@@ -126,7 +126,7 @@ Every time moisture or location updates:
 - If it's raining, pump stays OFF regardless of moisture level
 
 ### 📊 Live Sensor Dashboard
-- Real-time moisture %, temperature °C, and humidity % from ESP32
+- Real-time soil moisture % from ESP32 sensor
 - Moisture progress bar showing level vs threshold at a glance
 - Recent activity log with timestamps pulled from Firebase `/history`
 
@@ -251,7 +251,7 @@ Then build the APK from Android Studio.
 ### 6. ESP32 Firmware
 
 - Open `/firmware` folder in Arduino IDE
-- Set your WiFi SSID, password, and Firebase credentials in `config.h`
+- Replace WiFi  SSID, password, and Firebase credentials in main.ino
 - Flash to ESP32
 - Sensor data will begin syncing to Firebase automatically
 
@@ -263,9 +263,7 @@ Then build the APK from Android Studio.
 {
   "plant": {
     "moisture": 42,
-    "temperature": 28,
-    "humidity": 65,
-    "pump": "OFF",
+         "pump": "OFF",
     "threshold": 50,
     "type": "wheat",
     "place": "Pune, Maharashtra"
