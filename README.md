@@ -263,7 +263,7 @@ Then build the APK from Android Studio.
 {
   "plant": {
     "moisture": 42,
-         "pump": "OFF",
+          "pump": "OFF",
     "threshold": 50,
     "type": "wheat",
     "place": "Pune, Maharashtra"
@@ -271,7 +271,6 @@ Then build the APK from Android Studio.
   "history": {
     "1716800000000": {
       "moisture": 38,
-      "temperature": 29,
       "timestamp": 1716800000000
     }
   }
