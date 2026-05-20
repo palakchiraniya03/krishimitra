@@ -36,21 +36,18 @@ void setup() {
 }
 
 void loop() {
-  // Read soil moisture
   int moistureRaw = analogRead(MOISTURE_PIN);
   int moisture = map(moistureRaw, 4095, 0, 0, 100);
 
   Serial.print("Moisture: ");
   Serial.println(moisture);
 
-  // Send moisture to Firebase
   if (Firebase.RTDB.setInt(&fbdo, "/plant/moisture", moisture)) {
     Serial.println("Moisture sent");
   } else {
     Serial.println(fbdo.errorReason());
   }
 
-  // Log to history
   String path = "/history/" + String(millis());
   Firebase.RTDB.setInt(&fbdo, path + "/moisture", moisture);
   Firebase.RTDB.setInt(&fbdo, path + "/timestamp", millis());
