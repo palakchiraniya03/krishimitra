@@ -8,7 +8,7 @@ import { useLocation } from "@/hooks/use-location";
 import { useLanguage } from "@/hooks/use-language";
 import { getCropById } from "@/lib/crops";
 import plantFallback from "@/assets/plant-ficus.png";
-import logo from "@/assets/smartgrow-logo.png";
+import logo from "@/assets/krishimitra-logo.png";
 // import { db, ref, set } from "@/firebase";
 // import { useEffect, useState } from "react";
 import { ref, onValue, set } from "firebase/database";
@@ -109,7 +109,7 @@ useEffect(() => {
         {/* Header with Logo */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="SmartGrow" className="w-9 h-9 rounded-xl object-contain" />
+            <img src={logo} alt="KrishiMitra" className="w-9 h-9 rounded-xl object-contain" />
             <div>
               <p className="text-muted-foreground text-xs">{t("hello")}</p>
               <h1 className="text-lg font-bold text-foreground leading-tight">{userName} 👋</h1>
