@@ -6,6 +6,9 @@
 
 ## 📸 Screenshots
 
+## 📸 Screenshots
+
+### App Interface
 | Dashboard | Actions | Crop Select |
 |---|---|---|
 | ![Dashboard](public/screenshot-dashboard.png) | ![Actions](public/screenshot-actions.png) | ![Crops](public/screenshot-crops.png) |
@@ -14,6 +17,15 @@
 |---|---|
 | ![History](public/screenshot-history.png) | ![Settings](public/screenshot-settings.png) |
 
+### Multilingual Support
+| Dashboard (Hindi) | Crop Select (Marathi) |
+|---|---|
+| ![Hindi](public/screenshot-dashboard-hindi.png) | ![Marathi](public/screenshot-crops-marathi.png) |
+
+### Hardware Setup
+| ESP32 + Soil Moisture Sensor |
+|---|
+| ![Hardware](public/hardware-setup-1.jpg) |
 ---
 ## 📌 Table of Contents
 
