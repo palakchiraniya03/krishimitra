@@ -4,6 +4,17 @@
 
 ---
 
+## 📸 Screenshots
+
+| Dashboard | Actions | Crop Select |
+|---|---|---|
+| ![Dashboard](public/screenshot-dashboard.png) | ![Actions](public/screenshot-actions.png) | ![Crops](public/screenshot-crops.png) |
+
+| History | Settings |
+|---|---|
+| ![History](public/screenshot-history.png) | ![Settings](public/screenshot-settings.png) |
+
+---
 ## 📌 Table of Contents
 
 - [Overview](#overview)
