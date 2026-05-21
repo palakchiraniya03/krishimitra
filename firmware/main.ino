@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
+#include <time.h>
 
 // WiFi
 #define WIFI_SSID "YOUR_WIFI_NAME"
@@ -28,6 +29,15 @@ void setup() {
   }
   Serial.println("\nConnected!");
 
+  // Sync real time via NTP
+  configTime(19800, 0, "pool.ntp.org", "time.nist.gov");
+  Serial.print("Syncing time");
+  while (time(nullptr) < 1000000000) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println("\nTime synced!");
+
   config.api_key = API_KEY;
   config.database_url = DATABASE_URL;
   config.signer.tokens.legacy_token = DATABASE_SECRET;
@@ -36,21 +46,30 @@ void setup() {
 }
 
 void loop() {
+  // Read soil moisture
   int moistureRaw = analogRead(MOISTURE_PIN);
   int moisture = map(moistureRaw, 4095, 0, 0, 100);
 
+  // Get real timestamp
+  time_t now = time(nullptr);
+  unsigned long timestamp = (unsigned long)now * 1000;
+
   Serial.print("Moisture: ");
   Serial.println(moisture);
+  Serial.print("Timestamp: ");
+  Serial.println(timestamp);
 
+  // Send moisture to Firebase
   if (Firebase.RTDB.setInt(&fbdo, "/plant/moisture", moisture)) {
     Serial.println("Moisture sent");
   } else {
     Serial.println(fbdo.errorReason());
   }
 
-  String path = "/history/" + String(millis());
+  // Log to history with real timestamp
+  String path = "/history/" + String(timestamp);
   Firebase.RTDB.setInt(&fbdo, path + "/moisture", moisture);
-  Firebase.RTDB.setInt(&fbdo, path + "/timestamp", millis());
+  Firebase.RTDB.setInt(&fbdo, path + "/timestamp", timestamp);
 
   delay(5000);
 }
