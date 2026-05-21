@@ -25,3 +25,6 @@ dist-ssr
 
 android/app/build
 android/.gradle
+
+.env
+.env.local

@@ -3,20 +3,16 @@ import { getDatabase } from "firebase/database";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDU2Qqj8P26xgnEcciXNxtSvpMPQvZwM8c",
-  authDomain: "smart-irrigation-system1234.firebaseapp.com",
-  databaseURL:
-    "https://smart-irrigation-system1234-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "smart-irrigation-system1234",
-  storageBucket: "smart-irrigation-system1234.firebasestorage.app",
-  messagingSenderId: "584694035272",
-  appId: "1:584694035272:web:bc63a4b04d38b0262ef97d",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// ✅ FIRST initialize app
-const app = initializeApp(firebaseConfig);
-
-// ✅ THEN use app everywhere
+export const app = initializeApp(firebaseConfig);
 export const db = getDatabase(app);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();

@@ -41,7 +41,7 @@ useEffect(() => {
   const checkRain = async (lat, lon) => {
     
   try {
-    const API_KEY = "4415e0577b67054c93de0183d3e7307b";
+    const API_KEY = const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;;
 
     const res = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`
