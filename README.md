@@ -89,9 +89,9 @@ KrishiMitra is a full-stack IoT irrigation solution built for small and mid-scal
 │  ┌─────────────┐    ┌──────────────┐    ┌───────────────┐  │
 │  │HistoryScreen│    │Notifications │    │CropSelect     │  │
 │  │             │    │              │    │               │  │
-│  │ Moisture    │    │ Smart alerts │    │ Wheat, Rice,  │  │
-│  │ over time   │    │ pump + water │    │ Cotton, Maize │  │
-│  │ chart       │    │ reminders    │    │ Barley, Sugar │  │
+│  │ Moisture    │    │ Smart alerts │    │ 9 crops incl. │  │
+│  │ over time   │    │ pump + water │    │ Wheat, Rice,  │  │
+│  │ chart       │    │ reminders    │    │ Barley, etc.  │  │
 │  └─────────────┘    └──────────────┘    └───────────────┘  │
 └───────────────────┬─────────────────────────────────────────┘
                     │ fetch()
@@ -102,7 +102,6 @@ KrishiMitra is a full-stack IoT irrigation solution built for small and mid-scal
 │  → Returns current weather condition                        │
 │  → If rain detected → Auto pump paused                      │
 └─────────────────────────────────────────────────────────────┘
-```
 
 ### Auto Pump Logic Flow
 
@@ -154,7 +153,7 @@ Every time moisture or location updates:
 - Recent activity log with timestamps pulled from Firebase `/history`
 
 ### 🌾 Crop-Aware Thresholds
-- Supports 6 crops: Wheat, Rice, Barley, Sugarcane, Cotton, Maize
+- Supports 9 crops: Wheat, Rice, Barley, Sugarcane, Cotton, Maize, Tomato, Onion, Soybean
 - Each crop has a predefined optimal moisture threshold
 - User can switch crops anytime; threshold updates automatically
 
@@ -301,6 +300,9 @@ Then build the APK from Android Studio.
 ```
 
 ---
+- [Supported Crops](#supported-crops)
+- [Predictive Irrigation Model](#predictive-irrigation-model)
+- [Team](#team)
 
 ## Supported Crops
 
@@ -312,8 +314,50 @@ Then build the APK from Android Studio.
 | 🎋 Sugarcane | 60% |
 | 🌿 Cotton | 45% |
 | 🌽 Maize | 50% |
-
+| 🍅 Tomato | 55% |
+| 🧅 Onion | 45% |
+| 🌱 Soybean | 50% |
 ---
+
+## Predictive Irrigation Model
+
+Built a regression pipeline to predict the number of sensor readings until soil moisture crosses a crop-specific watering threshold, using real sensor data logged from the deployed ESP32, evaluated across all 9 crops supported by the app.
+
+**Data & Preprocessing**: 56 real moisture readings extracted from Firebase history. 11 readings of exactly 0% were identified as likely sensor-disconnect errors and removed, leaving 45 clean readings. Temporal order was used as a proxy for time, due to a firmware timestamp bug present during earlier logging (see Known Limitations).
+
+**Exploratory Data Analysis**: Cleaned readings ranged from 12% to 100% (mean 53.7%, median 45%, std dev 23.1), with no extreme skew — confirming the cleaning step removed clear sensor errors without over-trimming legitimate low readings.
+
+**Approach**: Engineered 2 features per example (most recent reading, recent trend) using a sliding-window transformation of the time series. Features were standardized before training so coefficients are directly comparable as feature importance. Linear Regression and Ridge Regression were both trained and compared; Ridge showed no improvement over plain Linear Regression (MAE 0.84 for both), indicating regularization wasn't needed to control overfitting at this sample size.
+
+**Cross-Validation Methodology**: Standard k-fold cross-validation risks data leakage here, since sliding windows overlap (consecutive windows share up to 4 of 5 readings) — randomly splitting overlapping windows across folds can let the model indirectly "see" near-duplicate test data during training. To avoid this, `TimeSeriesSplit` was used instead, which always trains on earlier readings and evaluates on later ones, preserving temporal order and avoiding leakage.
+
+**Feature Importance** (scaled coefficients, Wheat): `last_value` = 0.659, `trend` = -0.441 — the model relies more heavily on the current moisture level than on the recent rate of change.
+
+**Results** (TimeSeriesSplit cross-validated MAE, in readings):
+
+| Crop | MAE | Examples | Crop | MAE | Examples |
+|---|---|---|---|---|---|
+| Sugarcane (60%) | 0.09 | 30 | Cotton (45%) | 0.52 | 30 |
+| Tomato (55%) | 0.09 | 30 | Onion (45%) | 0.52 | 30 |
+| Maize (50%) | 0.13 | 30 | Wheat (40%) | 1.14 | 30 |
+| Soybean (50%) | 0.13 | 30 | Barley (35%) | 3.15 | 30 |
+| Rice (70%) | 0.38 | 40 | | | |
+
+**Data quality vs. quantity trade-off**: Removing suspected sensor-error readings reduced the Wheat training set from 46 to 30 examples. Several crops show very low MAE (0.09–0.13) on only ~24-30 training examples — at this sample size, such low error is more plausibly explained by limited test-set diversity than strong genuine model skill, even after correcting the cross-validation methodology. This is disclosed rather than presented as a strong result.
+
+**Error Analysis**: Residual analysis on Wheat showed a small negative mean residual (-0.168) and a residual standard deviation of 1.028, indicating fairly imprecise but roughly unbiased predictions. A window-size sensitivity check (sizes 3, 5, 7), re-run with the corrected TimeSeriesSplit methodology, found window size 5 performed best (MAE 1.14 vs. 1.45 and 1.16).
+
+**On data augmentation**: Synthetic data augmentation was considered but intentionally not used, since synthetically generated points risk introducing patterns that don't reflect genuine sensor behavior in a small, noisy real-world time series — a legitimate use case for it exists more in image/text data.
+
+**Key finding**: Prediction accuracy varies by crop threshold, with a general (though noisy, given sample size) tendency for higher-threshold crops to be more predictable than lower-threshold ones — likely because higher thresholds require shorter-horizon predictions with less time for trend uncertainty to compound.
+
+**Limitations**: Dataset size (24-40 examples per crop after cleaning) is small even by small-dataset ML standards, and several very-low-MAE results likely reflect limited test-set diversity rather than strong generalization. Demonstrates a complete ML evaluation pipeline (EDA, preprocessing, feature scaling, feature importance, model comparison, leakage-aware cross-validation, baseline comparison, residual diagnostics, hyperparameter sensitivity, and per-crop generalization analysis) on real hardware-collected data, with explicit acknowledgment of where results should be interpreted cautiously.
+
+![Prediction Results](ml-model/prediction_results.png)
+![Prediction vs Actual Reference](ml-model/prediction_vs_actual_reference.png)
+![Residual Plot](ml-model/residual_plot.png)
+![EDA Moisture Over Time](ml-model/eda_moisture_over_time.png)
+![EDA Moisture Distribution](ml-model/eda_moisture_distribution.png)
 
 ## Team
 
@@ -326,4 +370,4 @@ for the **IEEE Techfiesta Hackathon at PICT Pune** and **Resonance Hackathon, VI
 
 - **Timestamp overflow fix**: A 32-bit integer overflow bug in the ESP32 firmware's timestamp logic (affecting `/history` entries) has been identified and fixed in code — corrected to use 64-bit arithmetic and proper Firebase double storage. The fix has been independently verified at the logic level (confirmed correct 13-digit millisecond output via isolated testing), but full end-to-end verification via hardware flash and live Firebase write is pending ESP32 access.
 - **Firebase project access**: The Firebase project is currently owned under a teammate's Google account; full console-level testing access is pending being added as a project member.
-- **Predictive irrigation model**: In development — see below.
+- **Predictive irrigation model**: Completed — see [Predictive Irrigation Model](#predictive-irrigation-model) section above.
