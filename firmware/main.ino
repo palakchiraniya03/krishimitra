@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
 #include <time.h>
+#include <cstdint>
 
 // WiFi
 #define WIFI_SSID "YOUR_WIFI_NAME"
@@ -52,7 +53,7 @@ void loop() {
 
   // Get real timestamp
   time_t now = time(nullptr);
-  unsigned long timestamp = (unsigned long)now * 1000;
+  uint64_t timestamp = (uint64_t)now * 1000ULL;
 
   Serial.print("Moisture: ");
   Serial.println(moisture);
@@ -67,9 +68,11 @@ void loop() {
   }
 
   // Log to history with real timestamp
-  String path = "/history/" + String(timestamp);
+  char timestampStr[20];
+  snprintf(timestampStr, sizeof(timestampStr), "%llu", timestamp);
+  String path = "/history/" + String(timestampStr);
   Firebase.RTDB.setInt(&fbdo, path + "/moisture", moisture);
-  Firebase.RTDB.setInt(&fbdo, path + "/timestamp", timestamp);
+  Firebase.RTDB.setDouble(&fbdo, (path + "/timestamp").c_str(), (double)timestamp);
 
   delay(5000);
 }

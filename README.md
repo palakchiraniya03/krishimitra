@@ -321,3 +321,9 @@ Built in collaboration with **Divyam Jain**, **Aryan Shahi**, and **Diya Toshniw
 for the **IEEE Techfiesta Hackathon at PICT Pune** and **Resonance Hackathon, VIT** *(Finalist — IoT Domain)*.
 
 ---
+
+## Known Limitations & In Progress
+
+- **Timestamp overflow fix**: A 32-bit integer overflow bug in the ESP32 firmware's timestamp logic (affecting `/history` entries) has been identified and fixed in code — corrected to use 64-bit arithmetic and proper Firebase double storage. The fix has been independently verified at the logic level (confirmed correct 13-digit millisecond output via isolated testing), but full end-to-end verification via hardware flash and live Firebase write is pending ESP32 access.
+- **Firebase project access**: The Firebase project is currently owned under a teammate's Google account; full console-level testing access is pending being added as a project member.
+- **Predictive irrigation model**: In development — see below.
