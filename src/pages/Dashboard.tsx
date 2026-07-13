@@ -57,6 +57,29 @@ useEffect(() => {
     return false;
   }
 };
+
+const checkForecastRain = async (lat, lon, hoursAhead = 24) => {
+  try {
+    const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`
+    );
+    const data = await res.json();
+
+    const cutoff = Date.now() + hoursAhead * 60 * 60 * 1000;
+    const relevantSlots = data.list.filter((slot) => slot.dt * 1000 < cutoff);
+
+    if (relevantSlots.length === 0) return 0;
+
+    const maxPop = Math.max(...relevantSlots.map((s) => s.pop ?? 0));
+    console.log("Forecast rain probability (next", hoursAhead, "h):", maxPop);
+    return maxPop;
+  } catch (err) {
+    console.log("Forecast error:", err);
+    return 0;
+  }
+};
+
   const navigate = useNavigate();
   const userName = localStorage.getItem("userName") || "User";
   const { data, loading, error } = usePlantData();
@@ -79,13 +102,20 @@ useEffect(() => {
 
   const pumpIsOn = data.pump === "ON";
   const [isRaining, setIsRaining] = useState(false);
-  // 🌱 AUTO PUMP CONTROL
+
+// 🌱 AUTO PUMP CONTROL
 useEffect(() => {
-  if (data.moisture == null || !location.latitude || !location.longitude) return;
+  const effectiveLat = location.latitude ?? (data.location as any)?.lat ?? null;
+  const effectiveLon = location.longitude ?? (data.location as any)?.lng ?? null;
+
+  if (data.moisture == null || !effectiveLat || !effectiveLon) return;
 
   const runLogic = async () => {
-    const rain = await checkRain(location.latitude, location.longitude);
+    const rain = await checkRain(effectiveLat, effectiveLon);
     setIsRaining(rain);
+
+    const forecastPop = await checkForecastRain(effectiveLat, effectiveLon);
+    console.log("TEST — forecast rain probability:", forecastPop);
 
     if (data.moisture < threshold && !rain) {
       if (data.pump !== "ON") {
@@ -101,7 +131,7 @@ useEffect(() => {
   };
 
   runLogic();
-}, [data.moisture, location.latitude, location.longitude]);
+}, [data.moisture, location.latitude, location.longitude,data.location]);
 
   return (
     <MobileLayout>
