@@ -115,9 +115,10 @@ useEffect(() => {
     setIsRaining(rain);
 
     const forecastPop = await checkForecastRain(effectiveLat, effectiveLon);
-    console.log("TEST — forecast rain probability:", forecastPop);
+    const rainExpectedSoon = forecastPop > 0.7;
+    console.log("Forecast rain probability:", forecastPop, "| Skipping due to forecast:", rainExpectedSoon);
 
-    if (data.moisture < threshold && !rain) {
+    if (data.moisture < threshold && !rain && !rainExpectedSoon) {
       if (data.pump !== "ON") {
         console.log("AUTO → Turning pump ON");
         set(ref(db, "plant/pump"), "ON");
