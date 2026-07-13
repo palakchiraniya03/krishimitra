@@ -102,8 +102,17 @@ const checkForecastRain = async (lat, lon, hoursAhead = 24) => {
 
   const pumpIsOn = data.pump === "ON";
   const [isRaining, setIsRaining] = useState(false);
+  const [tick, setTick] = useState(0);
 
 // 🌱 AUTO PUMP CONTROL
+// 🔁 RECHECK EVERY 45 MIN (in case forecast changes without moisture changing)
+useEffect(() => {
+  const interval = setInterval(() => {
+    setTick((t) => t + 1);
+  }, 45 * 60 * 1000);
+  return () => clearInterval(interval);
+}, []);
+
 useEffect(() => {
   const effectiveLat = location.latitude ?? (data.location as any)?.lat ?? null;
   const effectiveLon = location.longitude ?? (data.location as any)?.lng ?? null;
@@ -132,7 +141,7 @@ useEffect(() => {
   };
 
   runLogic();
-}, [data.moisture, location.latitude, location.longitude,data.location]);
+}, [data.moisture, location.latitude, location.longitude,data.location,tick]);
 
   return (
     <MobileLayout>
