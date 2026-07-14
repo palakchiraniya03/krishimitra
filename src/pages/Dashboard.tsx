@@ -1,3 +1,5 @@
+import { CROP_KNOWLEDGE } from "@/lib/crop-knowledge";
+import { searchKnowledge, KnowledgeDoc } from "@/lib/retrieval";
 import { useNavigate } from "react-router-dom";
 import MobileLayout from "@/components/MobileLayout";
 import BottomNav from "@/components/BottomNav";
@@ -103,6 +105,7 @@ const checkForecastRain = async (lat, lon, hoursAhead = 24) => {
   const pumpIsOn = data.pump === "ON";
   const [isRaining, setIsRaining] = useState(false);
   const [tick, setTick] = useState(0);
+
 
 // 🌱 AUTO PUMP CONTROL
 // 🔁 RECHECK EVERY 45 MIN (in case forecast changes without moisture changing)
