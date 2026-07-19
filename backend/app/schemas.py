@@ -6,3 +6,7 @@ class SensorData(BaseModel):
     temperature: float
     humidity: float
     pumpStatus: str
+
+class PredictionRequest(BaseModel):
+    crop: str
+    moisture: float
