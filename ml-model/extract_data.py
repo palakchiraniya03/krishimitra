@@ -102,6 +102,15 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 model = LinearRegression()
 model.fit(X_train, y_train)
+
+import joblib
+
+joblib.dump(model, "model.pkl")
+joblib.dump(scaler, "scaler.pkl")
+
+print("Model saved as model.pkl")
+print("Scaler saved as scaler.pkl")
+
 print("Training examples:", len(X_train), "| Testing examples:", len(X_test))
 
 predictions = model.predict(X_test)
