@@ -54,8 +54,24 @@ def retrieve_crop_information(question: str):
     "score": float(similarities[0][best_index])
 }
 
+def generate_response(question: str):
+    result = retrieve_crop_information(question)
+
+    response = (
+        f"Based on your question, the most relevant crop is {result['crop']}.\n\n"
+        f"Recommended Moisture Range: {result['moistureRange']}\n\n"
+        f"Common Problems: {result['commonProblems']}\n\n"
+        f"Watering Tips: {result['wateringTips']}"
+    )
+
+    return {
+        "response": response,
+        "crop": result["crop"],
+        "score": result["score"]
+    }
+
 if __name__ == "__main__":
-  result = retrieve_crop_information(
-       "My onion bulbs are rotting."
-  )
-  print(result)
+    result = generate_response(
+        "My onion bulbs are rotting."
+    )
+    print(result)
