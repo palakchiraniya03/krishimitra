@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from app.crop_data import CROP_KNOWLEDGE
 from app.ml.predictor import IrrigationPredictor
-from app.schemas import PredictionRequest
-
+from app.schemas import SensorData, PredictionRequest, ChatRequest
+from app.chat import retrieve_crop_information
 app = FastAPI(
     title="KrishiMitra AI Service",
     description="Backend service for irrigation prediction and AI-powered crop assistance.",
@@ -47,3 +47,7 @@ def predict(request: PredictionRequest):
     )
 
     return result
+
+@app.post("/chat")
+def chat(request: ChatRequest):
+    return retrieve_crop_information(request.question)

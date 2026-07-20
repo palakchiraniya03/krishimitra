@@ -10,3 +10,6 @@ class SensorData(BaseModel):
 class PredictionRequest(BaseModel):
     crop: str
     moisture: float
+
+class ChatRequest(BaseModel):
+    question: str
