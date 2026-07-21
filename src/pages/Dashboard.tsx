@@ -3,7 +3,21 @@ import { searchKnowledge, KnowledgeDoc } from "@/lib/retrieval";
 import { useNavigate } from "react-router-dom";
 import MobileLayout from "@/components/MobileLayout";
 import BottomNav from "@/components/BottomNav";
-import { Bell, Droplets, Thermometer, Wind, ChevronRight, Zap, MapPin, Loader2, Power, AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react";
+import {
+  Bell,
+  Droplets,
+  Thermometer,
+  Wind,
+  ChevronRight,
+  Zap,
+  MapPin,
+  Loader2,
+  Power,
+  AlertTriangle,
+  CheckCircle2,
+  RefreshCw,
+  Bot,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlantData } from "@/hooks/use-plant-data";
 import { useLocation } from "@/hooks/use-location";
@@ -16,11 +30,13 @@ import logo from "@/assets/krishimitra-logo.png";
 import { ref, onValue, set } from "firebase/database";
 import { db } from "@/lib/firebase";
 import { useEffect, useState } from "react";
+import ChatWidget from "@/components/ChatWidget";
 
 const Dashboard = () => {
   const [place, setPlace] = useState("");
   
   const [history, setHistory] = useState([]);
+  const [chatOpen, setChatOpen] = useState(false);
 useEffect(() => {
   const placeRef = ref(db, "plant/place");
 
@@ -148,7 +164,7 @@ useEffect(() => {
 
   return (
     <MobileLayout>
-      <div className="px-5 pt-6 pb-24">
+      <div className="relative px-5 pt-6 pb-24">
         {/* Header with Logo */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -200,6 +216,33 @@ useEffect(() => {
           </div>
         )}
 
+        {/* ================= AI Assistant ================= */}
+        <div className="bg-card rounded-2xl border border-border shadow-sm p-4 mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Bot size={24} className="text-primary" />
+            </div>
+
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground">
+                KrishiMitra AI
+              </h3>
+
+              <p className="text-xs text-muted-foreground">
+                Ask questions about irrigation, crop diseases, fertilizers and weather.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            onClick={() => setChatOpen(true)}
+            className="w-full mt-4 rounded-xl h-11 gap-2"
+          >
+            <Bot size={18} />
+            Ask AI
+          </Button>
+        </div>
+        {/* ================================================= */}
         {/* Plant Card */}
         <div
           onClick={() => navigate("/plant-details")}
@@ -287,17 +330,17 @@ useEffect(() => {
 )}
 
         {/* Action Button */}
-        <Button
-          onClick={() => navigate("/actions")}
-          className="w-full h-12 rounded-xl text-base font-semibold mb-6 gap-2"
-        >
-          <Zap size={18} />
-          {t("take_action")}
-          <ChevronRight size={16} />
-        </Button>
+          <Button
+            onClick={() => navigate("/actions")}
+            className="w-full h-12 rounded-xl text-base font-semibold mb-6 gap-2"
+          >
+            <Zap size={18} />
+            {t("take_action")}
+            <ChevronRight size={16} />
+          </Button>
 
-        {/* Activity */}
-        <div>
+          {/* Activity */}
+          <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-foreground">{t("recent_activity")}</h3>
             <button onClick={() => navigate("/history")} className="text-primary text-xs font-medium">
@@ -328,6 +371,11 @@ useEffect(() => {
         </div>
       </div>
       <BottomNav />
+
+      <ChatWidget
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+      />
     </MobileLayout>
   );
 };

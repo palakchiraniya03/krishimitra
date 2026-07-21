@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from app.crop_data import CROP_KNOWLEDGE
+from fastapi.middleware.cors import CORSMiddleware
 from app.ml.predictor import IrrigationPredictor
 from app.schemas import SensorData, PredictionRequest, ChatRequest
 from app.rag import generate_rag_response
@@ -7,6 +8,17 @@ app = FastAPI(
     title="KrishiMitra AI Service",
     description="Backend service for irrigation prediction and AI-powered crop assistance.",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 predictor = IrrigationPredictor()
 
