@@ -24,6 +24,7 @@ def build_crop_documents():
 
     for crop_id, data in CROP_KNOWLEDGE.items():
         text = (
+            crop_id + " " +
             data["moistureRange"] + " " +
             data["commonProblems"] + " " +
             data["wateringTips"]
