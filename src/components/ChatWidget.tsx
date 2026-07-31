@@ -26,7 +26,8 @@ const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
         </SheetHeader>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto mt-6">
+        <div className="flex-1 overflow-y-auto mt-6 space-y-4">
+
           <div className="bg-muted rounded-xl p-4">
             <p className="text-sm font-medium">
               👋 Hello! I'm KrishiMitra AI.
@@ -43,6 +44,19 @@ const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
               <li>🌦 Weather-based farming</li>
             </ul>
           </div>
+
+          {response && (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <p className="text-sm font-semibold mb-2">
+                🌱 KrishiMitra AI
+              </p>
+
+              <p className="text-sm whitespace-pre-wrap">
+                {response}
+              </p>
+            </div>
+          )}
+
         </div>
 
         {/* Input Area */}

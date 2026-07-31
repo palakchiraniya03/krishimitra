@@ -45,14 +45,20 @@ def retrieve_crop_information(question: str):
 
     similarities = cosine_similarity(question_vector, document_vectors)
 
+    best_score = float(similarities[0].max())
     best_index = similarities.argmax(axis=1)[0]
+
+    SIMILARITY_THRESHOLD = 0.25
+
+    if best_score < SIMILARITY_THRESHOLD:
+        return None
 
     return {
     "crop": crop_ids[best_index],
     "moistureRange": CROP_KNOWLEDGE[crop_ids[best_index]]["moistureRange"],
     "commonProblems": CROP_KNOWLEDGE[crop_ids[best_index]]["commonProblems"],
     "wateringTips": CROP_KNOWLEDGE[crop_ids[best_index]]["wateringTips"],
-    "score": float(similarities[0][best_index])
+    "score": best_score
 }
 
 def generate_response(question: str):
