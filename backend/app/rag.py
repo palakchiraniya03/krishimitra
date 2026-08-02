@@ -16,50 +16,56 @@ def generate_rag_response(question: str):
             "response": "I couldn't find relevant information in the knowledge base."
         }
 
-    context = ""
-
+    # Build a concise context block from retrieved documents. The LLM must ONLY use
+    # this text as its knowledge source.
+    context_parts = []
     for doc in retrieved["documents"]:
-        context += f"""
-    Crop:
-    {doc["crop"]}
+        part = (
+            f"Crop: {doc.get('crop','')}\n"
+            f"Ideal Moisture Range: {doc.get('moistureRange','')}\n"
+            f"Common Problems: {doc.get('commonProblems','')}\n"
+            f"Watering Tips: {doc.get('wateringTips','')}\n"
+        )
+        context_parts.append(part)
 
-    Ideal Moisture Range:
-    {doc["moistureRange"]}
+    context = "\n----\n".join(context_parts)
 
-    Common Problems:
-    {doc["commonProblems"]}
-
-    Watering Tips:
-    {doc["wateringTips"]}
-
-    --------------------------
-    """
-
+    # Improved, safety-focused prompt. It instructs the LLM to behave as an
+    # agricultural expert, to rely ONLY on the retrieved context, to avoid
+    # hallucinations, and to reply in three short labeled sections.
     prompt = f"""
-You are KrishiMitra, an AI assistant for farmers.
+You are KrishiMitra, an agricultural expert assistant for farmers.
 
-Use ONLY the following crop information to answer the user's question.
-
-Retrieved Knowledge:
+CONTEXT (use ONLY this information):
 {context}
 
-User Question:
+USER QUESTION:
 {question}
 
-Instructions:
-- Answer in simple language.
-- Use only the provided information.
-- Do not invent facts.
-- If the information is insufficient, clearly say so.
+RESPONSE FORMAT and RULES:
+- Use ONLY the CONTEXT above. If the context does not contain enough information to answer, say so clearly and do NOT guess.
+- Never hallucinate or introduce facts not present in the CONTEXT.
+- Keep the answer short and practical.
+- Provide exactly three short labeled sections: Recommendation, Reason, Warning.
+  * Recommendation: concise, actionable advice.
+  * Reason: one-sentence explanation citing the CONTEXT.
+  * Warning: short note about risks or uncertainty (can be "None" if not applicable).
+- Do not include extra commentary, filler, or internal chain-of-thought.
+
+Answer now following the rules above.
 """
 
     answer = generate_llm_response(prompt)
 
+    # Safety: if LLM returned nothing or an empty response, provide a fallback.
+    if not answer or (isinstance(answer, str) and not answer.strip()):
+        answer = "I couldn't generate a reliable answer."
+
     return {
         "response": answer,
-        "best_crop": retrieved["best_crop"],
-        "best_score": retrieved["best_score"],
-        "documents": retrieved["documents"]
+        "best_crop": retrieved.get("best_crop"),
+        "best_score": retrieved.get("best_score"),
+        "documents": retrieved.get("documents")
     }
 
 
