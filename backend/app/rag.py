@@ -16,22 +16,32 @@ def generate_rag_response(question: str):
             "response": "I couldn't find relevant information in the knowledge base."
         }
 
+    context = ""
+
+    for doc in retrieved["documents"]:
+        context += f"""
+    Crop:
+    {doc["crop"]}
+
+    Ideal Moisture Range:
+    {doc["moistureRange"]}
+
+    Common Problems:
+    {doc["commonProblems"]}
+
+    Watering Tips:
+    {doc["wateringTips"]}
+
+    --------------------------
+    """
+
     prompt = f"""
 You are KrishiMitra, an AI assistant for farmers.
 
 Use ONLY the following crop information to answer the user's question.
 
-Crop:
-{retrieved['crop']}
-
-Ideal Moisture Range:
-{retrieved['moistureRange']}
-
-Common Problems:
-{retrieved['commonProblems']}
-
-Watering Tips:
-{retrieved['wateringTips']}
+Retrieved Knowledge:
+{context}
 
 User Question:
 {question}
@@ -47,8 +57,9 @@ Instructions:
 
     return {
         "response": answer,
-        "crop": retrieved["crop"],
-        "score": retrieved["score"]
+        "best_crop": retrieved["best_crop"],
+        "best_score": retrieved["best_score"],
+        "documents": retrieved["documents"]
     }
 
 

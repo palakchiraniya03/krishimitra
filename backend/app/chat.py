@@ -45,20 +45,46 @@ def retrieve_crop_information(question: str):
 
     similarities = cosine_similarity(question_vector, document_vectors)
 
-    best_score = float(similarities[0].max())
-    best_index = similarities.argmax(axis=1)[0]
+    scores = similarities[0]
+
+    top_indices = scores.argsort()[::-1][:3]
+
+    best_index = top_indices[0]
+    best_score = float(scores[best_index])
+
+    print("\n===== Top Retrieved Documents =====")
+
+    for idx in top_indices:
+        print(
+            crop_ids[idx],
+            "->",
+            round(float(scores[idx]), 4)
+        )
+
+    print("===============================\n")
 
     SIMILARITY_THRESHOLD = 0.25
 
     if best_score < SIMILARITY_THRESHOLD:
         return None
 
+    retrieved_docs = []
+
+    for idx in top_indices:
+        crop = crop_ids[idx]
+
+        retrieved_docs.append({
+            "crop": crop,
+            "moistureRange": CROP_KNOWLEDGE[crop]["moistureRange"],
+            "commonProblems": CROP_KNOWLEDGE[crop]["commonProblems"],
+            "wateringTips": CROP_KNOWLEDGE[crop]["wateringTips"],
+            "score": float(scores[idx])
+        })
+
     return {
-    "crop": crop_ids[best_index],
-    "moistureRange": CROP_KNOWLEDGE[crop_ids[best_index]]["moistureRange"],
-    "commonProblems": CROP_KNOWLEDGE[crop_ids[best_index]]["commonProblems"],
-    "wateringTips": CROP_KNOWLEDGE[crop_ids[best_index]]["wateringTips"],
-    "score": best_score
+    "documents": retrieved_docs,
+    "best_crop": crop_ids[best_index],
+    "best_score": best_score
 }
 
 def generate_response(question: str):
