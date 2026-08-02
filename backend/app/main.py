@@ -62,4 +62,12 @@ def predict(request: PredictionRequest):
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    return generate_rag_response(request.question)
+    return generate_rag_response(
+        question=request.question,
+        crop=request.crop,
+        moisture=request.moisture,
+        temperature=request.temperature,
+        humidity=request.humidity,
+        pump_status=request.pumpStatus,
+        threshold=request.threshold,
+    )

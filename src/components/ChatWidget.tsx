@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { usePlantData } from "@/hooks/use-plant-data";
 import {
   Sheet,
   SheetContent,
@@ -24,6 +25,7 @@ const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
   const [question, setQuestion] = useState<string>("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const { data } = usePlantData();
 
   // Refs for input focus and auto-scroll
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -48,11 +50,10 @@ const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
   }, [open]);
 
   // Centralized send handler: avoids duplicated fetch logic.
-  const handleSend = async () => {
+    const handleSend = async () => {
     const trimmed = question.trim();
     if (!trimmed || loading) return;
 
-    // Add user's message optimistically
     const userMessage: ChatMessage = {
       role: "user",
       text: trimmed,
@@ -63,33 +64,53 @@ const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
     setLoading(true);
 
     try {
+      console.log("Sending sensor data:", {
+        crop: data.type,
+        moisture: data.moisture,
+        threshold: data.threshold,
+        temperature: data.temperature,
+        humidity: data.humidity,
+        pump: data.pump,
+      });
       const res = await fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: trimmed }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: trimmed,
+          crop: data.type,
+          moisture: data.moisture,
+          temperature: data.temperature,
+          humidity: data.humidity,
+          pumpStatus: data.pump,
+          threshold: data.threshold,
+        }),
       });
 
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(`Server responded with ${res.status}`);
+      }
 
-      // Backend may return different shapes; be defensive
-      const assistantText: string = data?.response ?? "I couldn't generate a reliable answer.";
-      const bestCrop: string | undefined = data?.best_crop;
-      const bestScore: number | undefined = data?.best_score;
+      const responseData = await res.json();
 
       const assistantMessage: ChatMessage = {
         role: "assistant",
-        text: assistantText,
-        crop: bestCrop,
-        score: typeof bestScore === "number" ? bestScore : undefined,
+        text:
+          responseData.response ??
+          "I couldn't generate a reliable answer.",
+        crop: responseData.best_crop,
+        score: responseData.best_score,
         timestamp: new Date().toISOString(),
       };
 
       setMessages((m) => [...m, assistantMessage]);
 
-      // Clear textbox and keep focus
       setQuestion("");
       setTimeout(() => inputRef.current?.focus(), 20);
-    } catch (e) {
+    } catch (err) {
+      console.error(err);
+
       const errMsg: ChatMessage = {
         role: "assistant",
         text: "Unable to contact the AI server. Please try again.",
@@ -187,7 +208,9 @@ const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
 
           <button
             onClick={() => void handleSend()}
-            disabled={loading || question.trim() === ""}
+            disabled={
+              loading || question.trim() === "" || data.moisture === null
+            }
             className="w-full rounded-xl bg-primary text-primary-foreground py-3 font-medium disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? "Thinking..." : "Send"}

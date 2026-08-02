@@ -13,3 +13,9 @@ class PredictionRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str
+    crop: str
+    moisture: float
+    temperature: float
+    humidity: float
+    pumpStatus: str
+    threshold: float
