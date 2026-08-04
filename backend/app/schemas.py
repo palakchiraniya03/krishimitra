@@ -19,3 +19,6 @@ class ChatRequest(BaseModel):
     humidity: float
     pumpStatus: str
     threshold: float
+
+    isRaining: bool
+    forecastRainProbability: float

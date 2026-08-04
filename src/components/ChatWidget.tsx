@@ -10,6 +10,8 @@ import {
 interface ChatWidgetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isRaining: boolean;
+  forecastRainProbability: number;
 }
 
 // Chat message structure used by this component
@@ -21,7 +23,12 @@ interface ChatMessage {
   timestamp: string; // ISO string
 }
 
-const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
+const ChatWidget = ({
+  open,
+  onOpenChange,
+  isRaining,
+  forecastRainProbability,
+}: ChatWidgetProps) => {
   const [question, setQuestion] = useState<string>("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -79,12 +86,16 @@ const ChatWidget = ({ open, onOpenChange }: ChatWidgetProps) => {
         },
         body: JSON.stringify({
           question: trimmed,
-          crop: data.type,
-          moisture: data.moisture,
-          temperature: data.temperature,
-          humidity: data.humidity,
-          pumpStatus: data.pump,
-          threshold: data.threshold,
+          crop: data.type ?? "wheat",
+          moisture: data.moisture ?? 0,
+          temperature: data.temperature ?? 0,
+          humidity: data.humidity ?? 0,
+          pumpStatus: data.pump ?? "OFF",
+          threshold: data.threshold ?? 40,
+
+          // Weather context
+          isRaining,
+          forecastRainProbability,
         }),
       });
 

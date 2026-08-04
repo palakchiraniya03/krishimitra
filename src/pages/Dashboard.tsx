@@ -121,7 +121,7 @@ const checkForecastRain = async (lat, lon, hoursAhead = 24) => {
   const pumpIsOn = data.pump === "ON";
   const [isRaining, setIsRaining] = useState(false);
   const [tick, setTick] = useState(0);
-
+  const [forecastRainProbability, setForecastRainProbability] = useState(0);
 
 // 🌱 AUTO PUMP CONTROL
 // 🔁 RECHECK EVERY 45 MIN (in case forecast changes without moisture changing)
@@ -143,6 +143,7 @@ useEffect(() => {
     setIsRaining(rain);
 
     const forecastPop = await checkForecastRain(effectiveLat, effectiveLon);
+    setForecastRainProbability(forecastPop);
     const rainExpectedSoon = forecastPop > 0.7;
     console.log("Forecast rain probability:", forecastPop, "| Skipping due to forecast:", rainExpectedSoon);
 
@@ -375,6 +376,8 @@ useEffect(() => {
       <ChatWidget
         open={chatOpen}
         onOpenChange={setChatOpen}
+        isRaining={isRaining}
+        forecastRainProbability={forecastRainProbability}
       />
     </MobileLayout>
   );

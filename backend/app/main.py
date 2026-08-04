@@ -70,4 +70,7 @@ def chat(request: ChatRequest):
         humidity=request.humidity,
         pump_status=request.pumpStatus,
         threshold=request.threshold,
+
+        is_raining=request.isRaining,
+        forecast_rain_probability=request.forecastRainProbability,
     )
