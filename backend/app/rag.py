@@ -21,7 +21,6 @@ def generate_rag_response(
     retrieved = retrieve_crop_information(
         f"{crop} {question}"
     )
-    print(retrieved)
 
     if retrieved is None:
         return {
