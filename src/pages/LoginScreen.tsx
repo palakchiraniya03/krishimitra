@@ -33,10 +33,10 @@ const LoginScreen = () => {
 
   // ✅ SAVE LOGIN
   localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("userName", name || "User");
-    localStorage.setItem("userEmail", email);
+  localStorage.setItem("userName", name || "User");
+  localStorage.setItem("userEmail", email);
 
-  window.location.href = "/dashboard";
+  navigate("/dashboard");
 };
 
   return (
