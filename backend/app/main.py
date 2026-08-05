@@ -15,6 +15,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:8080",
         "http://127.0.0.1:8080",
+        "https://krishimitra-mocha.vercel.app",
+        "https://krishimitra-8ay644fkw-palak-chiraniya.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
