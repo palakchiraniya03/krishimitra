@@ -56,6 +56,8 @@ const ChatWidget = ({
     }
   }, [open]);
 
+
+    const API_URL = import.meta.env.VITE_API_URL;
   // Centralized send handler: avoids duplicated fetch logic.
     const handleSend = async () => {
     const trimmed = question.trim();
@@ -79,7 +81,7 @@ const ChatWidget = ({
         humidity: data.humidity,
         pump: data.pump,
       });
-      const res = await fetch("http://127.0.0.1:8000/chat", {
+      const res = await fetch(`${API_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
