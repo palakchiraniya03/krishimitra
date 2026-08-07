@@ -498,25 +498,6 @@ Additional evaluation was performed to understand model behaviour beyond MAE.
 - Explore more advanced forecasting models once larger datasets become available.
 
 ---
-
-## ⚠️ Known Limitations & Future Work
-
-### Current Limitations
-
-- The predictive irrigation model is trained on a relatively small real-world dataset collected from the deployed ESP32 system. Prediction accuracy is expected to improve as more sensor history becomes available.
-- The current machine learning pipeline performs offline batch training using exported Firebase history rather than continuous online learning.
-- The Retrieval-Augmented Generation (RAG) module currently uses TF-IDF and cosine similarity for document retrieval. Semantic embedding-based retrieval is planned to improve answer quality for larger knowledge bases.
-- The current prediction model uses historical soil moisture trends only. Future versions will incorporate additional environmental variables such as temperature, humidity, rainfall, and weather forecasts.
-
-### Future Improvements
-
-- Increase the amount of real sensor data collected through long-term field deployment.
-- Replace TF-IDF retrieval with embedding-based semantic search.
-- Support incremental (online) model updates without requiring manual retraining.
-- Evaluate more advanced forecasting models after collecting a larger dataset.
-- Expand support for additional crops, sensors, and regional irrigation practices.
----
-
 ## 👥 Contributors
 
 | Contributor | Responsibilities |
