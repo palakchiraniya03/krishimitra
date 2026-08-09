@@ -13,10 +13,17 @@ Responsibilities:
 # Step 2: Connect it to FastAPI.
 # Step 3: Integrate with frontend chatbot.
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
 from app.crop_data import CROP_KNOWLEDGE
+
+SEMANTIC_SIMILARITY_THRESHOLD = 0.25
+EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
+
+print("Loading semantic embedding model...")
+model = SentenceTransformer(EMBEDDING_MODEL_NAME)
+print("Semantic embedding model loaded.")
 
 def build_crop_documents():
     documents = []
@@ -37,15 +44,27 @@ def build_crop_documents():
 
 crop_ids, documents = build_crop_documents()
 
-vectorizer = TfidfVectorizer()
-document_vectors = vectorizer.fit_transform(documents)
+# The crop knowledge base is small and static, so we precompute embeddings once at import time.
+document_vectors = model.encode(
+    documents,
+    convert_to_numpy=True,
+).astype(np.float32)
+
+document_norms = np.linalg.norm(document_vectors, axis=1, keepdims=True)
+document_norms[document_norms == 0] = 1.0
+document_vectors = document_vectors / document_norms
 
 def retrieve_crop_information(question: str):
-    question_vector = vectorizer.transform([question])
+    question_vector = model.encode(
+        [question],
+        convert_to_numpy=True,
+    ).astype(np.float32)
 
-    similarities = cosine_similarity(question_vector, document_vectors)
+    question_norm = np.linalg.norm(question_vector, axis=1, keepdims=True)
+    question_norm[question_norm == 0] = 1.0
+    question_vector = question_vector / question_norm
 
-    scores = similarities[0]
+    scores = np.dot(question_vector, document_vectors.T)[0]
 
     top_indices = scores.argsort()[::-1][:3]
 
@@ -63,9 +82,7 @@ def retrieve_crop_information(question: str):
 
     print("===============================\n")
 
-    SIMILARITY_THRESHOLD = 0.25
-
-    if best_score < SIMILARITY_THRESHOLD:
+    if best_score < SEMANTIC_SIMILARITY_THRESHOLD:
         return None
 
     retrieved_docs = []
@@ -82,9 +99,12 @@ def retrieve_crop_information(question: str):
         })
 
     return {
-    "documents": retrieved_docs,
-    "best_crop": crop_ids[best_index],
-    "best_score": best_score
+        "documents": retrieved_docs,
+        "best_crop": crop_ids[best_index],
+        "best_score": best_score,
+        "crop_ids": crop_ids,
+        "crop": crop_ids[best_index],
+        "score": best_score,
 }
 
 def generate_response(question: str):
