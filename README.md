@@ -346,6 +346,10 @@ The `plant` node stores the latest live sensor readings used by the irrigation e
 |---|---|---|
 | ![Dashboard](public/screenshot-dashboard.png) | ![Actions](public/screenshot-actions.png) | ![Crops](public/screenshot-crops.png) |
 
+### 💬 AI Crop Assistant
+
+![KrishiMitra AI Crop Assistant](public/krishimitra-ai-assistant.png)
+
 | History | Settings |
 |---|---|
 | ![History](public/screenshot-history.png) | ![Settings](public/screenshot-settings.png) |
