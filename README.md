@@ -14,6 +14,7 @@ KrishiMitra is an end-to-end AI + IoT smart irrigation system that combines real
 ![Groq](https://img.shields.io/badge/Groq-F55036?style=for-the-badge)
 ![Llama 3.1](https://img.shields.io/badge/Llama_3.1-8A2BE2?style=for-the-badge)
 ![RAG](https://img.shields.io/badge/RAG-Retrieval--Augmented--Generation-blue?style=for-the-badge)
+![FastEmbed](https://img.shields.io/badge/FastEmbed-ONNX-blue?style=for-the-badge)
 
 ---
 ## 🌾 Problem Statement
@@ -94,12 +95,26 @@ Every irrigation recommendation passes through the following pipeline before bei
 | 🌦️ 2 | **OpenWeather API** | Fetch current weather conditions and forecast rain probability for the selected location. |
 | 🤖 3 | **Machine Learning Model** | Predict approximately how many future readings remain before soil moisture reaches the crop-specific irrigation threshold. |
 | ⚖️ 4 | **Rule Engine** | Determine whether irrigation is required using crop thresholds, current moisture, rainfall status, and forecast rain probability. |
-| 📚 5 | **RAG Retrieval** | Retrieve the most relevant crop-specific knowledge from the knowledge base using TF-IDF and cosine similarity. |
+| 📚 5 | **RAG Retrieval** | Retrieve the most relevant crop-specific knowledge from the knowledge base using FastEmbed semantic embeddings and cosine similarity. |
 | 💬 6 | **Groq + Llama 3.1** | Generate a natural-language explanation for the backend recommendation using the retrieved knowledge and live sensor data. |
 | 📱 7 | **Mobile Application** | Display the recommendation, explanation, live sensor values, and historical information to the farmer. |
 
 > **Important:** The LLM **does not decide** whether irrigation should occur. The recommendation is computed entirely by the backend rule engine. The LLM's responsibility is only to explain that decision in clear, natural language.
 
+---
+
+## 🔎 Semantic Crop Retrieval
+
+KrishiMitra uses lightweight semantic retrieval to ground the AI assistant's responses in crop-specific agricultural knowledge.
+
+- Crop knowledge documents are converted into semantic embeddings using **FastEmbed** with the `all-MiniLM-L6-v2` model.
+- The user's question is embedded using the same model.
+- **Cosine similarity** is used to rank the most relevant crop knowledge documents.
+- The top relevant documents are passed to the response-generation pipeline as contextual knowledge.
+- A similarity threshold prevents low-relevance queries from producing unsupported crop-specific results.
+- FastEmbed uses an **ONNX-based runtime**, avoiding the heavier PyTorch/SentenceTransformers runtime and making the backend more suitable for memory-constrained deployment environments.
+
+This retrieval layer provides semantic matching rather than relying only on exact keyword overlap.
 ---
 
 ## ⚙️ Tech Stack
@@ -111,8 +126,8 @@ Every irrigation recommendation passes through the following pipeline before bei
 | **Database** | Firebase Realtime Database, Firebase Authentication |
 | **Hardware** | ESP32, Soil Moisture Sensor |
 | **Machine Learning** | Scikit-learn (Linear Regression, Ridge Regression, StandardScaler) |
-| **AI & NLP** | Groq API, Llama 3.1, Retrieval-Augmented Generation (RAG) |
-| **Information Retrieval** | TF-IDF, Cosine Similarity |
+| **AI & NLP** | Groq API, Llama 3.1, FastEmbed, ONNX Runtime, Retrieval-Augmented Generation (RAG) |
+| **Information Retrieval** | Semantic Embeddings, Cosine Similarity |
 | **Weather Integration** | OpenWeather API |
 | **UI** | Tailwind CSS, shadcn/ui, Lucide React |
 | **Routing & State** | React Router DOM, Custom React Hooks |
@@ -129,7 +144,7 @@ Every irrigation recommendation passes through the following pipeline before bei
 | ☁️ **Weather-Aware Irrigation** | Integrates OpenWeather API to incorporate current weather conditions and forecast rain probability into irrigation decisions. |
 | 🤖 **Machine Learning Forecasting** | Predicts approximately how many future sensor readings remain before soil moisture reaches the crop-specific irrigation threshold using a trained Linear Regression model. |
 | ⚖️ **Deterministic Rule Engine** | Makes reliable irrigation decisions using crop thresholds, current soil moisture, rainfall status, and forecast rain probability. |
-| 📚 **Retrieval-Augmented Generation (RAG)** | Retrieves crop-specific information using TF-IDF and cosine similarity to provide grounded responses. |
+| 📚 **Retrieval-Augmented Generation (RAG)** | Retrieves relevant crop-specific information using FastEmbed semantic embeddings and cosine similarity to provide grounded responses. |
 | 💬 **Explainable AI Assistant** | Uses Groq-hosted Llama 3.1 to explain irrigation recommendations in simple, natural language without overriding backend decisions. |
 | 📱 **Cross-Platform Mobile Application** | Built using React, TypeScript, and Capacitor to provide live monitoring, AI assistance, historical trends, and irrigation recommendations. |
 | 🔔 **Smart Notifications & Pump Monitoring** | Displays pump status, irrigation alerts, and important updates to help farmers monitor field conditions efficiently. |
