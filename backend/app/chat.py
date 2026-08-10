@@ -14,7 +14,7 @@ Responsibilities:
 # Step 3: Integrate with frontend chatbot.
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
 from app.crop_data import CROP_KNOWLEDGE
 
@@ -22,7 +22,9 @@ SEMANTIC_SIMILARITY_THRESHOLD = 0.25
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 
 print("Loading semantic embedding model...")
-model = SentenceTransformer(EMBEDDING_MODEL_NAME)
+model = TextEmbedding(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
 print("Semantic embedding model loaded.")
 
 def build_crop_documents():
@@ -45,20 +47,20 @@ def build_crop_documents():
 crop_ids, documents = build_crop_documents()
 
 # The crop knowledge base is small and static, so we precompute embeddings once at import time.
-document_vectors = model.encode(
-    documents,
-    convert_to_numpy=True,
-).astype(np.float32)
+document_vectors = np.array(
+    list(model.embed(documents)),
+    dtype=np.float32,
+)
 
 document_norms = np.linalg.norm(document_vectors, axis=1, keepdims=True)
 document_norms[document_norms == 0] = 1.0
 document_vectors = document_vectors / document_norms
 
 def retrieve_crop_information(question: str):
-    question_vector = model.encode(
-        [question],
-        convert_to_numpy=True,
-    ).astype(np.float32)
+    question_vector = np.array(
+        list(model.embed([question])),
+        dtype=np.float32,
+    )
 
     question_norm = np.linalg.norm(question_vector, axis=1, keepdims=True)
     question_norm[question_norm == 0] = 1.0
