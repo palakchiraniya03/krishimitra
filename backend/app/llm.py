@@ -13,7 +13,7 @@ client = Groq(
 
 def generate_llm_response(prompt: str) -> str:
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="openai/gpt-oss-20b",
         messages=[
             {
                 "role": "user",
